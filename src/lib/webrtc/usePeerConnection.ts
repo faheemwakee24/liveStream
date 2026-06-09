@@ -155,7 +155,7 @@ export function usePeerConnection(
 
     return () => {
       try { signalingRef.current.send({ type: "bye", from: signalingRef.current.selfId }); } catch {}
-      pc.getSenders().forEach((s) => s.track && s.track.stop && undefined);
+      // local tracks are owned by the page; don't stop them here
       pc.ontrack = null;
       pc.onicecandidate = null;
       pc.onconnectionstatechange = null;
