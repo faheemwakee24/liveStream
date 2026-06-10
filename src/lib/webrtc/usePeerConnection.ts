@@ -149,16 +149,22 @@ export function usePeerConnection(
     const remote = new MediaStream();
     setRemoteStream(remote);
     pc.ontrack = (ev) => {
-      const [stream] = ev.streams;
-      if (stream) {
-        stream.getTracks().forEach((t) => {
-          if (!remote.getTracks().find((rt) => rt.id === t.id)) remote.addTrack(t);
-        });
-      } else {
-        remote.addTrack(ev.track);
+      console.log("[webrtc] ontrack", ev.track.kind, "streams:", ev.streams.length);
+      const track = ev.track;
+      if (!remote.getTracks().find((t) => t.id === track.id)) {
+        remote.addTrack(track);
       }
+      track.onunmute = () => {
+        console.log("[webrtc] track unmuted", track.kind);
+        setRemoteStream(new MediaStream(remote.getTracks()));
+      };
+      track.onended = () => {
+        console.log("[webrtc] track ended", track.kind);
+      };
+      // Force a state update so React re-renders with the new track
       setRemoteStream(new MediaStream(remote.getTracks()));
     };
+
 
     pc.onicecandidate = (ev) => {
       if (ev.candidate) {

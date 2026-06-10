@@ -204,7 +204,7 @@ function RoomPage() {
               stream={pc.remoteStream}
               label="Them"
               placeholder={pc.peerCount === 0 ? "Waiting for someone to join…" : "Connecting…"}
-              camOff={pc.status !== "connected" || !pc.remoteStream?.getVideoTracks().length}
+              camOff={!pc.remoteStream || pc.remoteStream.getVideoTracks().length === 0}
             />
             <VideoTile
               stream={localStream}
