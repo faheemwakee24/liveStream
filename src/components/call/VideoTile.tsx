@@ -15,21 +15,33 @@ export function VideoTile({ stream, label, muted, mirrored, micOff, camOff, plac
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (ref.current && stream) ref.current.srcObject = stream;
+    const el = ref.current;
+    if (!el) return;
+    if (el.srcObject !== stream) el.srcObject = stream;
+    if (stream) {
+      el.play().catch((err) => console.warn("[VideoTile] play() failed", err));
+    }
   }, [stream]);
+
+  const showPlaceholder = !stream || camOff;
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl">
-      {stream && !camOff ? (
+      {/* Always mount the <video> when we have a stream so audio plays even if camera is off */}
+      {stream && (
         <video
           ref={ref}
           autoPlay
           playsInline
           muted={muted}
-          className={`h-full w-full object-cover ${mirrored ? "scale-x-[-1]" : ""}`}
+          className={`h-full w-full object-cover ${mirrored ? "scale-x-[-1]" : ""} ${
+            showPlaceholder ? "invisible" : ""
+          }`}
         />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface to-surface-2">
+      )}
+
+      {showPlaceholder && (
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gradient-to-br from-surface to-surface-2">
           <div className="flex flex-col items-center gap-3 text-muted-foreground">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-brand text-3xl font-semibold text-primary-foreground">
               {(placeholder ?? label).slice(0, 1).toUpperCase()}
