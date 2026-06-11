@@ -7,7 +7,7 @@ interface Props {
   muted?: boolean;
   mirrored?: boolean;
   micOff?: boolean;
-  camOff?: boolean;
+  camOff?: boolean;  
   placeholder?: string;
 }
 
