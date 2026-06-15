@@ -1,5 +1,8 @@
 import { IncomingMessage } from 'node:http';
-import serverEntry from '../src/server';
+
+// Import the pre-built SSR handler (Node.js ESM bundle produced by `npm run vercel-build`)
+// Do NOT import from ../src/server — that requires a Nitro/Cloudflare build context.
+import serverEntry from '../dist/server/server.js';
 
 function getFullUrl(req: IncomingMessage) {
   const host = req.headers.host ?? 'localhost';
@@ -34,7 +37,7 @@ export default async function handler(req: IncomingMessage, res: any) {
   const response = await serverEntry.fetch(request, {}, {});
 
   res.statusCode = response.status;
-  response.headers.forEach((value, key) => {
+  response.headers.forEach((value: string, key: string) => {
     res.setHeader(key, value);
   });
 
